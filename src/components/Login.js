@@ -5,15 +5,22 @@ import { firebaseErrorMessage } from "../utils/firebaseErrorMessage";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [toggleSignIn, setToggleSignIn] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
 
   const email = useRef(null);
   const password = useRef(null);
+  const name = useRef(null);
 
   const toggleSignInForm = () => {
     setErrorMessage(null);
@@ -24,24 +31,36 @@ const Login = () => {
     setErrorMessage(null);
     const emailValue = email.current.value;
     const passwordValue = password.current.value;
-    // const inValidMessage = checkValiddata(emailValue, passwordValue);
-    // setErrorMessage(inValidMessage);
-    // if (inValidMessage) return;
+    const inValidMessage = checkValiddata(emailValue, passwordValue);
+    setErrorMessage(inValidMessage);
+    if (inValidMessage) return;
 
     if (!toggleSignIn) {
       try {
-        await createUserWithEmailAndPassword(auth, emailValue, passwordValue);
-        alert("Signed up successfully!");
-      } catch (error) {
-        console.log(error.code);
+        const nameValue = name.current.value;
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          emailValue,
+          passwordValue
+        );
+        await updateProfile(userCredential.user, {
+          displayName: nameValue || "User",
+        });
 
+        dispatch(
+          addUser({
+            displayName: nameValue || "User",
+          })
+        );
+        navigate("/browse");
+      } catch (error) {
         const errMessage = firebaseErrorMessage(error.code);
         setErrorMessage(errMessage);
       }
     } else {
       try {
         await signInWithEmailAndPassword(auth, emailValue, passwordValue);
-        alert("Signed up successfully!");
+        navigate("/browse");
       } catch (error) {
         const errMessage = firebaseErrorMessage(error.code);
         setErrorMessage(errMessage);
@@ -68,6 +87,7 @@ const Login = () => {
         </h1>
         {!toggleSignIn && (
           <input
+            ref={name}
             type="name"
             placeholder="Full Name"
             className="p-4 my-4 w-full bg-gray-100 bg-opacity-10"
