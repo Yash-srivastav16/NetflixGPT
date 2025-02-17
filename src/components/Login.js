@@ -1,22 +1,22 @@
-import React, { useRef, useState } from "react";
-import Header from "./Header";
-import { checkValiddata } from "../utils/validation";
-import { firebaseErrorMessage } from "../utils/firebaseErrorMessage";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
+import React, { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import { auth } from "../utils/firebase";
+import { firebaseErrorMessage } from "../utils/firebaseErrorMessage";
 import { addUser } from "../utils/userSlice";
+import { checkValiddata } from "../utils/validation";
+import Header from "./Header";
+import { BACKGROUND_IMAGE_URL } from "../utils/constants";
 
 const Login = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [toggleSignIn, setToggleSignIn] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const email = useRef(null);
   const password = useRef(null);
@@ -34,7 +34,7 @@ const Login = () => {
     const inValidMessage = checkValiddata(emailValue, passwordValue);
     setErrorMessage(inValidMessage);
     if (inValidMessage) return;
-
+    setLoading(true);
     if (!toggleSignIn) {
       try {
         const nameValue = name.current.value;
@@ -52,18 +52,20 @@ const Login = () => {
             displayName: nameValue || "User",
           })
         );
-        navigate("/browse");
       } catch (error) {
         const errMessage = firebaseErrorMessage(error.code);
         setErrorMessage(errMessage);
+      } finally {
+        setLoading(false);
       }
     } else {
       try {
         await signInWithEmailAndPassword(auth, emailValue, passwordValue);
-        navigate("/browse");
       } catch (error) {
         const errMessage = firebaseErrorMessage(error.code);
         setErrorMessage(errMessage);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -72,7 +74,7 @@ const Login = () => {
       <Header />
       <div className="absolute w-full h-screen">
         <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/f268d374-734d-474f-ad13-af5ba87ef9fc/web/IN-en-20250210-TRIFECTA-perspective_92338d5d-6ccd-4b1a-8536-eb2b0240a55e_large.jpg"
+          src={BACKGROUND_IMAGE_URL}
           alt="background"
           className="w-full h-full object-cover"
         />
@@ -108,8 +110,9 @@ const Login = () => {
         />
         <p className="text-red-500 font-bold text-lg"> {errorMessage}</p>
         <button
-          className="p-2 my-6 bg-red-700 rounded-md w-full text-lg"
+          className="p-2 my-6 bg-red-700 rounded-md w-full text-lg disabled:bg-gray-600"
           onClick={handleButtonClick}
+          disabled={loading}
         >
           {toggleSignIn ? "Sign In" : "Sign Up"}
         </button>
