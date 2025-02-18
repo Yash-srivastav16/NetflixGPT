@@ -82,7 +82,7 @@ const Login = () => {
       </div>
       <form
         onSubmit={(e) => e.preventDefault()}
-        className="w-3/12 absolute rounded-lg p-12 bg-black bg-opacity-70 my-28 mx-auto right-0 left-0 text-white"
+        className="w-3/12 absolute rounded-lg p-6 bg-black bg-opacity-70 my-28 mx-auto right-0 left-0 text-white"
       >
         <h1 className="font-bold text-3xl py-4">
           {toggleSignIn ? "Sign In" : "Sign Up"}
@@ -116,8 +116,8 @@ const Login = () => {
         >
           {toggleSignIn ? "Sign In" : "Sign Up"}
         </button>
-        <p className="py-4 text-gray-300">
-          {toggleSignIn ? "New to Netflix? " : "Already registered? "}
+        <p className="py-1 text-gray-300">
+          {toggleSignIn ? "New to Redflix? " : "Already registered? "}
           <span
             className="font-bold text-white cursor-pointer"
             onClick={toggleSignInForm}

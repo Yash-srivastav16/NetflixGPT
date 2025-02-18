@@ -4,7 +4,7 @@ import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, removeUser } from "../utils/userSlice";
-import { LOGO_URL, USER_ICON } from "../utils/constants";
+import { USER_ICON } from "../utils/constants";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -31,11 +31,11 @@ const Header = () => {
       }
     });
     return () => unsubscribe();
-  }, []);
+  }, [dispatch, navigate]);
 
   return (
     <div className="absolute bg-gradient-to-b from-black w-screen px-8 py-2 z-10 flex justify-between">
-      <img className="w-44" src={LOGO_URL} alt="logo" />
+      <img className="w-60 h-20" src={"/logo.png"} alt="logo" />
       {user && (
         <div className="flex p-4">
           <img
